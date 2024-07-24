@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Progress</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            text-align: center;
+        }
+        .progress {
+            height: 30px;
+            border-radius: 5px;
+        }
+        .progress-bar {
+            font-size: 1rem;
+            line-height: 30px;
+        }
+        .log {
+            margin-top: 20px;
+            text-align: left;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Generating Excel...</h2>
+        <div class="progress">
+            <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%;">0%</div>
+        </div>
+        <div class="log" id="log"></div>
+    </div>
+    <script>
+        var socket = io();
+        socket.on('progress', function(data) {
+            var progress = data.progress;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-bar').innerText = progress + '%';
+        });
+
+        socket.on('log', function(data) {
+            var logElement = document.getElementById('log');
+            logElement.innerHTML += '<p>' + data.message + '</p>';
+            logElement.scrollTop = logElement.scrollHeight;
+        });
+
+        socket.on('task_complete', function(data) {
+            var downloadLink = document.createElement('a');
+            downloadLink.href = '/download';
+            downloadLink.click();
+            setTimeout(function() {
+                window.location.href = '/';
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
